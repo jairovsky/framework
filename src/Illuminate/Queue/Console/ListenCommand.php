@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Console;
 
+use InvalidArgumentException;
 use Illuminate\Queue\Listener;
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
@@ -47,6 +48,8 @@ class ListenCommand extends Command
      * Execute the console command.
      *
      * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     public function fire()
     {
@@ -62,6 +65,10 @@ class ListenCommand extends Command
         $connection = $this->input->getArgument('connection');
 
         $timeout = $this->input->getOption('timeout');
+
+        if ($timeout <= $this->input->getOption('sleep')) {
+            throw new InvalidArgumentException('--timeout value must be higher than --sleep');
+        }
 
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
